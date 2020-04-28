@@ -7,7 +7,7 @@
 			<input class="input-text" type="text" @confirm="sendMessge" v-model="inputValue" :focus="focus" @blur="blur" :placeholder="placeholder"></input>
 		</view>
 		<view class="footer-right">
-			<view id='msg-type' class="send-comment" @tap="sendMessge">发送</view>
+			<view id='msg-type' class="send-comment" @tap.stop="sendMessge">发送</view>
 		</view>
 	</view>
 </template>

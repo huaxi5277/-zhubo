@@ -56,7 +56,7 @@
 				isHidden: false,
 				cost_side: "",
 				index: 0,
-				timeId : 0
+				timeId: 0
 			};
 		},
 
@@ -93,15 +93,21 @@
 										this.userImg = res.avatar
 										this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
 										this.request({
-											url : interfaces.profile_all_id,
+											url: interfaces.profile_all_id,
 											header: {
 												'Authorization': JSON.parse(res_token.data).Token
 											},
-											success : (res)=>{
-												
-												this.realy_name = res.realy_name
-												this.sign = res.sign
-												this.phone = res.phone.toString()
+											success: (res) => {
+												if (res.realy_name) {
+													this.realy_name = res.realy_name
+												}
+												if (res.sign) {
+													this.sign = res.sign
+												}
+												if (res.phone) {
+													this.phone = res.phone.toString()
+												}
+
 											}
 										})
 									}
@@ -259,11 +265,11 @@
 											title: "修改成功",
 											icon: "none"
 										})
-										this.timeId = setTimeout(()=>{
+										this.timeId = setTimeout(() => {
 											uni.switchTab({
 												url: "../my-main"
 											})
-										},2000)
+										}, 2000)
 										return
 									}
 								})
@@ -271,11 +277,11 @@
 									title: "修改成功",
 									icon: "none"
 								})
-								this.timeId = setTimeout(()=>{
+								this.timeId = setTimeout(() => {
 									uni.switchTab({
 										url: "../my-main"
 									})
-								},2000)
+								}, 2000)
 							}
 						})
 					}

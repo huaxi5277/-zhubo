@@ -37,6 +37,38 @@ const interfaces = {
 	 
 	 // 用户发布动态
 	 update : domain + "public",
+	 // 用户点赞
+	 update_like : domain + "public/like",
+	 // 用户评论接口
+	 undate_comment : domain + "public/add",
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 // 添加联系人
+	 friend_add : domain + "friend/addfriend",
+	 
+	 // 查找联系人
+	 user_find_people : domain + "users/findbyemail",
+	 
+	 // 获取当前用户的好友
+	 
+	 friend_current_all : domain + "friend/findcurrentfriend",
+	 
+	 // 获取 聊天对象的头像 
+	 
+	 chat_current_avarar_and_friend : domain + "users/chatavatar",
+	 
+	 
+	 // 聊天记录相关
+	 
+	 chat_list_find :  domain + "chat_detail/findchat",
+	 chat_list_add : domain + "chat_detail/add"
 	 
 }
 module.exports = interfaces;

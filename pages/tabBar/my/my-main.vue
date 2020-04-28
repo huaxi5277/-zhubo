@@ -100,13 +100,22 @@
 										this.email = res.email
 										this.userImg = res.avatar
 										this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
+										console.log(JSON.parse(res_token.data).Token)
 										this.request({
+											
 											url : interfaces.profile_all_id,
 											header: {
 												'Authorization': JSON.parse(res_token.data).Token
 											},
 											success : (res)=>{
-												this.sign = res.sign
+												if(res.errors){
+													return 
+												}
+												else {
+													this.sign = res.sign
+													uni.setStorageSync("sign",this.sign)
+												}
+												
 											}
 										})
 									}

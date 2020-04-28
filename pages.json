@@ -21,7 +21,26 @@
 		{
 			"path": "pages/tabBar/people/people",
 			"style": {
-				"navigationBarTitleText": "联系人"
+				"navigationBarTitleText": "联系人",
+				"app-plus":{
+					"titleNView": {
+						"buttons":[
+							{
+								"text": "\ue63c",
+								"fontSize":"24px",
+								"fontSrc":"/static/iconfont/iconfont2.ttf",
+								"float":"right",
+								"color":"rgb(20, 91, 199)"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path":"pages/tabBar/my/add/add",
+			"style": {
+				"navigationBarTitleText": "添加联系人"
 			}
 		},
 		{
@@ -108,6 +127,12 @@
 			"path":"pages/tabBar/my/password/password",
 			"style":{
 				"navigationBarTitleText": "修改密码"
+			}
+		},
+		{
+			"path":"pages/tabBar/chat-main/chat-main",
+			"style":{
+				"navigationBarTitleText": "聊天"
 			}
 		}
 	],

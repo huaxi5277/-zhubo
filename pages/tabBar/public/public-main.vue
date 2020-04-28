@@ -4,73 +4,71 @@
 		<view class="home-pic">
 			<view class="home-pic-base">
 				<view class="top-pic">
-					<image class="header" src="../../../static/index/test/header06.jpg" @tap="test"></image>
+					<image class="header" :src="userImg||initImg" @tap="test"></image>
 				</view>
-				<view class="top-name">Liuxy</view>
+				<view class="top-name">{{name}}</view>
 			</view>
 		</view>
 
 		<view class="moments__post" v-for="(post,index) in posts" :key="index" :id="'post-'+index">
 			<view class="post-left">
-				<image class="post_header" :src="post.header_image"></image>
+				<image class="post_header" :src="post.user.avatar"></image>
 			</view>
 
 			<view class="post_right">
-				<text class="post-username">{{post.username}}</text>
-				<view id="paragraph" class="paragraph">{{post.content.text}}</view>
+				<text class="post-username">{{post.user.name}}</text>
+				<view id="paragraph" class="paragraph">{{post.page}}</view>
 				<!-- 相册 -->
 				<view class="thumbnails">
-					<view :class="post.content.images.length === 1?'my-gallery':'thumbnail'" v-for="(image, index_images) in post.content.images" :key="index_images">
-						<image class="gallery_img" lazy-load mode="aspectFill" :src="image" :data-src="image" @tap="previewImage(post.content.images,index_images)"></image>
+					<view :class="post.img.length === 1?'my-gallery':'thumbnail'" v-for="(image, index_images) in post.img" :key="index_images">
+						<image class="gallery_img" lazy-load mode="aspectFill" :src="image" :data-src="image" @tap="previewImage(post.img,index_images)"></image>
 					</view>
 				</view>
 				<!-- 资料条 -->
 				<view class="toolbar">
-					<view class="timestamp">{{post.timestamp}}</view>
-					<view class="like" @tap="like(index)">
-						<image :src="post.islike===0?'../../../static/index/islike.png':'../../../static/index/like.png'"></image>
+					<view class="timestamp">{{dealTime(post.date)}}</view>
+					<view class="like" @tap="like(post._id)">
+						<image :src="post.likes.length===0?'../../../static/index/islike.png':'../../../static/index/like.png'"></image>
 					</view>
-					<view class="comment" @tap="comment(index)">
+					<view class="comment" @tap="go_comment(post._id)">
 						<image src="../../../static/index/comment.png"></image>
 					</view>
 				</view>
 				<!-- 赞／评论区 -->
-				<view class="post-footer">
+				<view class="post-footer" v-if="post.comment.length>0 || post.likes.length>0 ">
 					<view class="footer_content">
 						<image class="liked" src="../../../static/index/liked.png"></image>
-						<text class="nickname" v-for="(user,index_like) in post.like" :key="index_like">{{user.username}}</text>
+						<text class="nickname" v-for="(user,index_like) in post.likes" :key="index_like">{{user.user_name}}</text>
 					</view>
-					<view class="footer_content" v-for="(comment,comment_index) in post.comments.comment" :key="comment_index" @tap="reply(index,comment_index)">
-						<text class="comment-nickname">{{comment.username}}: <text class="comment-content">{{comment.content}}</text></text>
+					<view class="footer_content" v-for="(comment,comment_index) in post.comment" :key="comment_index" >
+						<text class="comment-nickname">{{comment.name}}: <text class="comment-content">{{comment.comment_msg}}</text></text>
 					</view>
 				</view>
 			</view>
 			<!-- 结束 post -->
 		</view>
 
-		<view class="foot" v-show="showInput">
-			<chat-input @send-message="send_comment" @blur="blur" :focus="focus" :placeholder="input_placeholder"></chat-input>
-			<!-- <chat-input @send-message="send_comment" @blur="blur" :placeholder="input_placeholder"></chat-input> -->
+		<view class="my_footer" v-if="showInput">
+			<view class="footer-center">
+				<input class="input-text" type="text"  v-model="inputValue" :focus="focus"  placeholder="placeholder"></input>
+			</view>
+			<view class="footer-right">
+				<view id='msg-type' class="send-comment" @tap="sendMessge">发送</view>
+			</view>
 		</view>
-		<view class="uni-loadmore" v-if="showLoadMore">{{loadMoreText}}</view>
+	<!-- 	<view class="uni-loadmore" v-if="showLoadMore">{{loadMoreText}}</view> -->
 	</view>
 
 </template>
 
 <script>
-	import chatInput from '../../../components/im-chat/chatinput.vue'; //input框
-	import postData from '../../../common/index/index.post.data.js';//朋友圈数据
-	
+	import postData from '../../../common/index/index.post.data.js'; //朋友圈数据
+	import interfaces from '../../../utils/interfaces.js'
 	export default {
-		components: {
-			chatInput
-		},
 		data() {
 			return {
-				posts: postData,//模拟数据
+				posts: [], //模拟数据
 				user_id: 4,
-				username: 'Liuxy',
-
 				index: '',
 				comment_index: '',
 
@@ -78,25 +76,18 @@
 				focus: false, //是否自动聚焦输入框
 				is_reply: false, //回复还是评论
 				showInput: false, //评论输入框
-
+                inputValue:"",
 				screenHeight: '', //屏幕高度(系统)
 				platform: '',
-				windowHeight: '' ,//可用窗口高度(不计入软键盘)
-				
+				windowHeight: '', //可用窗口高度(不计入软键盘)
+
 				loadMoreText: "加载中...",
 				showLoadMore: false,
+				name : "",
+				initImg :"",
+				userImg : "",
+				
 			}
-		},
-		mounted() {
-			
-			uni.getStorage({
-				key: 'posts',
-				success: function (res) {
-					console.log(res.data);
-					this.posts = res.data;
-				}
-			});
-
 		},
 		onLoad() {
 			uni.getSystemInfo({ //获取设备信息
@@ -109,56 +100,126 @@
 		},
 		onShow() {
 			uni.onWindowResize((res) => { //监听窗口尺寸变化,窗口尺寸不包括底部导航栏
-				if(this.platform === 'ios'){
+				if (this.platform === 'ios') {
 					this.windowHeight = res.size.windowHeight;
 					this.adjust();
-				}else{
+				} else {
 					if (this.screenHeight - res.size.windowHeight > 60 && this.windowHeight <= res.size.windowHeight) {
 						this.windowHeight = res.size.windowHeight;
 						this.adjust();
 					}
 				}
 			});
+			this.request({
+				url: interfaces.update,
+				method: 'GET',
+				success: res => {
+					this.posts = res
+				}
+			});
+			let currentTime = Date.now() / 1000
+			
+			uni.getStorage({
+				key: "currentUser",
+				success: (res_token => {
+					// 拿着 token  去 请求 current  拿到 id 
+					// 先发起一个请求 
+					this.request({
+						url: interfaces.user_isover,
+						method: "POST",
+						data: {
+							current: currentTime,
+							jwtd: JSON.parse(res_token.data).Token
+						},
+						success: (result) => {
+							if (result.callbackMsg) {
+								this.request({
+									url: interfaces.user_current,
+									method: "GET",
+									header: {
+										'Authorization': JSON.parse(res_token.data).Token
+									},
+									success: (res) => {
+										this.id = res.id
+										this.name = res.name
+										this.userImg = res.avatar
+										this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
+
+									}
+								})
+			
+							} else {
+								this.name = "点击登录"
+								this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
+								uni.clearStorageSync();
+								uni.navigateTo({
+									url: '../login/login'
+								})
+								console.log(1)
+							}
+						},
+						fail: () => {
+							this.name = "点击登录"
+							this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
+							uni.clearStorageSync();
+							uni.navigateTo({
+								url: '../login/login'
+							})
+						}
+					})
+			
+				}),
+				fail: () => {
+					this.name = "点击登录"
+					this.initImg = "https://avatar.bbs.miui.com/images/noavatar_small.gif"
+					uni.clearStorageSync();
+					uni.navigateTo({
+						url: '../login/login'
+					})
+				}
+			})
+			
 		},
 		onHide() {
 			uni.offWindowResize(); //取消监听窗口尺寸变化
 		},
-		onUnload() {
-			this.max = 0,
-				this.data = [],
-				this.loadMoreText = "加载更多",
-				this.showLoadMore = false;
-		},
-		onReachBottom() { //监听上拉触底事件
-			console.log('onReachBottom');
-			this.showLoadMore = true;
-			setTimeout(() => {
-				//获取数据
-				if (this.posts.length < 20){//测试数据
-					this.posts = this.posts.concat(this.posts);
-				}else{
-					this.loadMoreText = "暂无更多";
-				}
-			}, 1000);
-		},
-		onPullDownRefresh() { //监听下拉刷新动作
-			console.log('onPullDownRefresh');
-			// 这里获取数据
-			setTimeout(function() {
-				//初始化数据
-				uni.stopPullDownRefresh(); //停止下拉刷新
-			}, 1000);
-		},
-		onNavigationBarButtonTap(e) {//监听标题栏点击事件
-			if (e.index == 0) {
-				this.navigateTo('../publish/publish')
-			}
-		},
-		computed:{
-			
+		computed: {
+
 		},
 		methods: {
-			test(){
+			sendMessge(){
+				uni.request({
+					url: interfaces.undate_comment,
+					method: 'POST',
+					data: {
+						page : this.inputValue,
+						comment_id : this.comment_index,
+						user_id : this.id,
+						name : this.name
+					},
+					success: res => {
+						this.request({
+							url: interfaces.update,
+							method: 'GET',
+							success: result => {
+								this.posts = result
+								this.showInput = false
+								this.inputValue = ""
+							}
+						});
+					}
+				});
+			},
+			go_comment(index){
+				this.comment_index = index
+				this.showInput = !this.showInput
+			},
+			dealTime(time) {
+				const T = time.indexOf('T')
+				time = time.substr(0, T)
+				return time
+			},
+			test() {
 				this.navigateTo('../test/test');
 			},
 			navigateTo(url) {
@@ -167,19 +228,40 @@
 				});
 			},
 			like(index) {
-				if (this.posts[index].islike === 0) {
-					this.posts[index].islike = 1;
-					this.posts[index].like.push({
-						"uid": this.user_id,
-						"username": "," + this.username
-					});
-				} else {
-					this.posts[index].islike = 0;
-					this.posts[index].like.splice(this.posts[index].like.indexOf({
-						"uid": this.user_id,
-						"username": "," + this.username
-					}), 1);
-				}
+				// 一点赞 先改变样式  请求
+				uni.getStorage({
+					key : "currentUser",
+					success : (res_token=>{
+						this.request({
+							url: interfaces.update_like,
+							method: 'POST',
+							header:{
+								'Authorization': JSON.parse(res_token.data).Token
+							},
+							data: {
+								msg_id : index,
+								user_name : this.name
+							},
+							success: res => {
+								if(res.errorStatus){
+									uni.showToast({
+									 title:"该用户以赞过",
+									 icon:"none"
+									})
+								}
+								else{
+									this.request({
+										url: interfaces.update,
+										method: 'GET',
+										success: res => {
+											this.posts = res
+										}
+									});
+								}
+							},
+						});
+					})
+				})
 			},
 			comment(index) {
 				this.showInput = true; //调起input框
@@ -207,32 +289,7 @@
 					}).exec();
 				}).exec();
 			},
-			reply(index, comment_index) {
-				this.is_reply = true; //回复中
-				this.showInput = true; //调起input框
-				let replyTo = this.posts[index].comments.comment[comment_index].username;
-				this.input_placeholder = '回复' + replyTo;
-				this.index = index; //post索引
-				this.comment_index = comment_index; //评论索引
-				this.focus = true;
-			},
 			blur: function() {
-				this.init_input();
-			},
-			send_comment: function(message) {
-
-				if (this.is_reply) {
-					var reply_username = this.posts[this.index].comments.comment[this.comment_index].username;
-					var comment_content = '回复' + reply_username + ':' + message.content;
-				} else {
-					var comment_content = message.content;
-				}
-				this.posts[this.index].comments.total += 1;
-				this.posts[this.index].comments.comment.push({
-					"uid": this.user_id,
-					"username": this.username,
-					"content": comment_content //直接获取input中的值
-				});
 				this.init_input();
 			},
 			init_input() {
@@ -259,12 +316,73 @@
 		},
 		onNavigationBarButtonTap() {
 			uni.navigateTo({
-				url:"./public-publish"
+				url: "./public-publish"
 			})
 		}
 	}
 </script>
 
-<style scoped>
+<style>
 	@import url("../../../common/index/index.css");
+	.my_footer {
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		height: 80upx;
+		min-height: 80upx;
+		border-top: solid 1px #bbb;
+		overflow: hidden;
+		padding: 5upx;
+		background-color: #F4F5F6;
+		position: fixed;
+		bottom: 100upx;
+	}
+	.footer-left {
+	
+		width: 80upx;
+		height: 80upx;
+	
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.footer-right {
+		width: 120upx;
+		height: 80upx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #1482D1;
+	}
+	.footer-center {
+		flex: 1;
+		padding-left: 20upx;
+		height: 80upx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.footer-center .input-text {
+		flex: 1;
+		background: #fff;
+		/* border: solid 1upx #ddd; */
+		padding: 10upx !important;
+		font-family: verdana !important;
+		overflow: hidden;
+		border-radius: 15upx;
+	}
+	.nickname{
+		margin-right: 12upx;
+		}
+	.footer-right .send-comment{
+		background-color: #007AFF;
+		text-align: center;
+		line-height: 60upx;
+		color: #FFFFFF;
+		width: 80upx;
+		height: 60upx;
+		border-radius: 5px;
+		font-size: 10px;
+		/* height: 60upx; */
+	}
 </style>
