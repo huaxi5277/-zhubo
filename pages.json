@@ -1,0 +1,153 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/tabBar/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/tabBar/register/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/tabBar/msg/msg-on",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/tabBar/people/people",
+			"style": {
+				"navigationBarTitleText": "联系人"
+			}
+		},
+		{
+			"path": "pages/tabBar/public/public-main",
+			"style":{
+				"navigationBarTitleText":"广场",
+				
+				"app-plus":{
+					"titleNView": {
+						"buttons":[
+							{
+								"text": "\ue712",
+								"fontSize":"28px",
+								"fontSrc":"/static/iconfont.ttf",
+								"float":"right",
+								"color":"rgb(51, 139, 215)"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path":"pages/tabBar/public/public-publish",
+			"style":{
+				"navigationBarTitleText":"发表动态",
+				"app-plus":{
+					"titleNView": {
+						"buttons":[
+							{
+								"text": "发布",
+								"fontSize":"16px",
+								"float":"right",
+								"color":" rgb(51, 139, 215)"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/tabBar/my/my-main",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/tabBar/my/skin-change/skin-change",
+			"style": {
+				"navigationBarTitleText": "切换皮肤"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/info/info",
+			"style": {
+				"navigationBarTitleText": "我的名片"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/about/about",
+			"style":{
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/help/help",
+			"style":{
+				"navigationBarTitleText": "帮助中心"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/setting/setting",
+			"style":{
+				"navigationBarTitleText": "系统设置"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/safe/safe",
+			"style":{
+				"navigationBarTitleText": "系统设置"
+			}
+		},
+		{
+			"path":"pages/tabBar/my/password/password",
+			"style":{
+				"navigationBarTitleText": "修改密码"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar":{
+			"color":"#8a8a8a",
+			"selectedColor": "#333333",
+			"borderStyle":"black",
+			"backgroundColor":"#FFFFFF",
+			"list":[
+				{
+					"pagePath":"pages/tabBar/msg/msg-on",
+					"iconPath":"static/tabbar/消息.png",
+					"selectedIconPath":"static/tabbar/消息-on.png",
+					"text":"消息"
+				},
+				
+				{
+					"pagePath":"pages/tabBar/people/people",
+					"iconPath":"static/tabbar/联系人.png",
+					"selectedIconPath":"static/tabbar/联系人-on.png",
+					"text":"联系人"
+				},
+				{
+					"pagePath":"pages/tabBar/public/public-main",
+					"iconPath":"static/tabbar/广场.png",
+					"selectedIconPath":"static/tabbar/广场-on.png",
+					"text":"广场"
+				},
+				{
+					"pagePath":"pages/tabBar/my/my-main",
+					"iconPath":"static/tabbar/我的.png",
+					"selectedIconPath":"static/tabbar/我的-on.png",
+					"text":"个人中心"
+				}
+			]
+		}
+}
